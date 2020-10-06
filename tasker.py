@@ -130,3 +130,28 @@ class TaskerDo :
         pos = imagesearch_loop(self.main_path + "\\task_images\\accept_diverted_power\\key.jpg", 0)
 
         pyautogui.click(x=pos[0] + 10, y=pos[1] + 40)
+
+    def do_download_data(self) :
+        pos = imagesearch_loop(self.main_path + "\\task_images\\download_data\\key.jpg", 0)
+
+        pyautogui.click(x=pos[0] + 40, y=pos[1] + 5)
+    
+    def do_upload_data(self) :
+        pos = imagesearch_loop(self.main_path + "\\task_images\\upload_data\\key.jpg", 0)
+
+        pyautogui.click(x=pos[0] + 40, y=pos[1] + 5)
+    
+    def do_swipe_card(self) :
+        pyautogui.click(x=760, y=820)
+        sleep(.3)
+        pyautogui.moveTo(510, 490)
+        pyautogui.mouseDown()
+        pyautogui.moveTo(1430, 420, 3, pyautogui.easeInOutQuad)
+        sleep(.1)
+        pyautogui.mouseUp()
+    
+    def do_unlock_manifolds(self) :
+        for i in range(10) :
+            pos = imagesearch_loop(self.main_path + "\\task_images\\unlock_manifolds\\" + str(i + 1) + ".jpg", 0)
+
+            pyautogui.click(x=pos[0] + 10, y=pos[1] + 10)

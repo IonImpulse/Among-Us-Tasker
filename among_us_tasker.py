@@ -51,10 +51,10 @@ List of all tasks this program can automate, marked with DONE:
 - Start Reactor              DONE
 - Store Artifacts
 - Submit Scan
-- Swipe Card
-- Unlock Manifolds
-- Upload Data
-- - Download Data
+- Swipe Card                 DONE (slow)
+- Unlock Manifolds           DONE
+- Upload Data                DONE
+- - Download Data            DONE
 - Water Plants
 '''
 
