@@ -1,4 +1,5 @@
 import os
+from re import match
 import pyautogui
 import time
 from pyautogui import sleep
@@ -37,27 +38,47 @@ class TaskerDo :
         return getattr(self, 'do_' + str(name), lambda: default)()
     
     def do_fix_wiring(self) :
-        wires = ["blue", "red", "purple", "yellow"]
+        
+        def match_color(rgb) :
+            color = ""
 
-        for wire_pair in wires :
-            tries = 0
-            complete = False
-
-            while tries < 5 and complete == False : 
-                pos_left = imagesearch(self.main_path + "\\task_images\\fix_wiring\\left_" + wire_pair + ".jpg", precision=.8)
-                pos_right = imagesearch(self.main_path + "\\task_images\\fix_wiring\\right_" + wire_pair + ".jpg", precision=.8)
-
-                if pos_left[0] != -1 and pos_right[0] != -1 :
-                    complete = True
-                
-                tries += 1
+            if rgb == (255, 0, 255) :
+                color = "purple"
+            elif rgb == (255, 235, 4) :
+                color = "yellow"
+            elif rgb == (0, 0, 255) :
+                color = "blue"
+            elif rgb == (255, 0, 0) :
+                color = "red"
             
-            if self.debug :
-                print(pos_left, pos_right)
+            return color
 
-            pyautogui.moveTo(pos_left[0] + 10, pos_left[1] + 70)
+        wires = ["blue", "red", "purple", "yellow"]
+        locations = [(555, 1370), (270, 462, 645, 830)]
+        im = pyautogui.screenshot()
+
+        left = []
+        right = []
+
+        for y in locations[1] :
+            
+            left_temp = im.getpixel((locations[0][0], y))
+            right_temp = im.getpixel((locations[0][1], y))
+
+            left.append(match_color(left_temp))
+            right.append(match_color(right_temp))
+            
+        if self.debug :
+            print(left, right)
+
+        for index, color in enumerate(left) :
+            
+            left_loc = (555, locations[1][index])
+            right_loc = (1370, locations[1][right.index(color)])
+            
+            pyautogui.moveTo(left_loc[0] + 10, left_loc[1] + 20)
             pyautogui.mouseDown()
-            pyautogui.moveTo(pos_right[0] - 20, pos_right[1] + 70, .01)
+            pyautogui.moveTo(right_loc[0] - 20, right_loc[1] + 20)
             pyautogui.mouseUp()
             pyautogui.click()
     
@@ -116,7 +137,7 @@ class TaskerDo :
                 pyautogui.click(x=button_coords[move_list[j] - 1][0], y=button_coords[move_list[j] - 1][1])
 
     def do_divert_power(self) :
-        pos = imagesearch_region_loop(self.main_path + "\\task_images\\divert_power\\to_divert.jpg", 0, 560, 745, 1352, 830)
+        pos = imagesearch_region_loop(self.main_path + "\\task_images\\divert_power\\to_divert.jpg", 0, 560, 745, 1352, 830, precision=.5)
         
         if self.debug :
             print(pos)
@@ -146,7 +167,7 @@ class TaskerDo :
         sleep(.3)
         pyautogui.moveTo(510, 490)
         pyautogui.mouseDown()
-        pyautogui.moveTo(1430, 420, 3, pyautogui.easeInOutQuad)
+        pyautogui.moveTo(1430, 420, 3.2, pyautogui.easeInOutQuad)
         sleep(.1)
         pyautogui.mouseUp()
     
@@ -155,3 +176,79 @@ class TaskerDo :
             pos = imagesearch_loop(self.main_path + "\\task_images\\unlock_manifolds\\" + str(i + 1) + ".jpg", 0)
 
             pyautogui.click(x=pos[0] + 10, y=pos[1] + 10)
+
+    def do_stabilize_steering(self) :
+        pyautogui.moveTo(960, 540)
+        sleep(.1)
+        pyautogui.click()
+
+    def do_empty_garbage(self) :
+        print("daf")
+        pyautogui.moveTo(1270, 430)
+        pyautogui.mouseDown()
+        pyautogui.moveTo(1270, 820, .2)
+        sleep(3)
+        pyautogui.mouseUp()
+
+    def do_refuel_station(self) :
+        pyautogui.moveTo(1470, 890)
+        pyautogui.mouseDown()
+        sleep(3.1)
+        pyautogui.mouseUp()
+
+    def do_fuel_engine(self) :
+        pyautogui.moveTo(1470, 890)
+        pyautogui.mouseDown()
+        sleep(3.1)
+        pyautogui.mouseUp()
+
+    def do_calibrate_distributer(self) :
+        
+        locations = [1230, (230, 500, 780)]
+
+        for i in range(3) :
+            done = False
+            while done == False :
+                im = pyautogui.screenshot()
+                matches = im.getpixel((locations[0], locations[1][i]))
+                if matches != (0,0,0) :
+                    pyautogui.click(x=locations[0], y=locations[1][i] + 90)
+                    done = True
+                sleep(.1)
+
+    def do_prime_shields(self) :
+        locations = [(963, 172), (739, 298), (1170, 298), (952, 422), (723, 550), (1170, 550), (952, 678)]
+        im = pyautogui.screenshot()
+                
+        for index, loc in enumerate(locations) :
+            matches = im.getpixel((locations[index][0], locations[index][1]))
+            if self.debug :
+                print(matches)
+            if matches[1] < 200 :
+                pyautogui.click(loc[0], loc[1] + 30)
+    
+    def do_clean_o2_filter(self) :
+        keep_going = True
+        while keep_going :
+            im = pyautogui.screenshot()
+
+            nothing_left = False
+            
+            for i in range(730, 1390, 5) :
+                for j in range(120, 980, 5) :
+                    pix = im.getpixel((i, j))
+                    
+                    if pix[0] > 60 and pix[0] < 80 and pix[1] > 70 and pix[1] < 85 and pix[2] > 14 and pix[2] < 25 :
+                        if self.debug :
+                            print(i,j)
+                        pyautogui.moveTo(i, j)
+                        pyautogui.mouseDown()
+                        pyautogui.moveTo(620, 540)
+                        pyautogui.moveTo(300, 540)
+                        pyautogui.mouseUp()
+                        sleep(.1)
+                        im = pyautogui.screenshot()
+                        nothing_left = True
+
+            if nothing_left == False :
+                keep_going = False
