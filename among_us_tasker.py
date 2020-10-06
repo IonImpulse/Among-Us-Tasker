@@ -19,17 +19,17 @@ SCREEN_SIZE = (1920, 1080)
 List of all tasks this program can automate, marked with DONE:
 Task that complete on selection are marked AUTO
 
-- Align Engine Output
+- Align Engine Output        DONE
 - Align Telescope
 - Assemble Artifact
 - Buy Beverage
 - Calibrate Distributer      DONE
-- Chart Course
+- Chart Course               DONE
 - Clean O2 Filter            DONE
-- Clear Asteroids
+- Clear Asteroids            DONE (may need to activate more then once)
 - Divert Power               DONE
 - - Accept Diverted Power    DONE
-- Empty Chute
+- Empty Chute                DONE
 - Empty Garbage              DONE
 - Enter ID Code
 - Fill Canisters
@@ -39,7 +39,7 @@ Task that complete on selection are marked AUTO
 - - Refuel Station           DONE
 - Insert Keys
 - Inspect Sample
-- Measure Weather
+- Measure Weather            
 - Monitor Tree
 - Open Waterways
 - Prime Shields              DONE
@@ -102,11 +102,11 @@ if __name__ == "__main__" :
                 
                 if TD.debug :
                     print(task_to_do_name)
-                
-                try :
-                    TD.switch(task_to_do_name)
+                TD.switch(task_to_do_name)
+                '''try :
+                    
                 except Exception as e :
-                    print(e)
+                    print(e)'''
         else :
             if TD.debug :
                 print(f"Did not find task, taking {time.perf_counter() - last} seconds")

@@ -33,6 +33,14 @@ class TaskerDo :
 
         return image_key_list
 
+    def is_approximate(self, rgb1, rgb2, tolerance) :
+        if rgb1[0] > rgb2[0] - tolerance and rgb1[0] < rgb2[0] + tolerance :
+            if rgb1[1] > rgb2[1] - tolerance and rgb1[1] < rgb2[1] + tolerance :
+                if rgb1[2] > rgb2[2] - tolerance and rgb1[2] < rgb2[2] + tolerance :
+                    return True
+        
+        return False
+    
     def switch(self, name):
         default = f"Error on {name}"
         return getattr(self, 'do_' + str(name), lambda: default)()
@@ -180,7 +188,8 @@ class TaskerDo :
     def do_stabilize_steering(self) :
         pyautogui.moveTo(960, 540)
         sleep(.1)
-        pyautogui.click()
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
 
     def do_empty_garbage(self) :
         print("daf")
@@ -237,8 +246,10 @@ class TaskerDo :
             for i in range(730, 1390, 5) :
                 for j in range(120, 980, 5) :
                     pix = im.getpixel((i, j))
-                    
-                    if pix[0] > 60 and pix[0] < 80 and pix[1] > 70 and pix[1] < 85 and pix[2] > 14 and pix[2] < 25 :
+                
+                    pix2 = (70, 77, 20)
+
+                    if self.is_approximate(pix, pix2, 9):
                         if self.debug :
                             print(i,j)
                         pyautogui.moveTo(i, j)
@@ -252,3 +263,77 @@ class TaskerDo :
 
             if nothing_left == False :
                 keep_going = False
+    
+    def do_chart_course(self) :
+        x_locs = (560, 763, 959, 1156, 1358)
+        ship_color = (35, 111, 159)
+        loc_color = (35, 111, 160)
+
+        im = pyautogui.screenshot()
+        y_locs = [270, 270, 270, 270, 270]
+
+        for i in range(5) :
+            j = 270
+            found = False
+            
+            while found == False and j < 810 :
+                pix = im.getpixel((x_locs[i], j))
+
+                if i == 0 :
+                    if self.is_approximate(pix, ship_color, 5) :
+                        y_locs[i] = (j)
+                        found = True
+                else :
+                    if self.is_approximate(pix, loc_color, 5) :
+                        y_locs[i] = (j)
+                        found = True
+
+                j += 1
+        
+        if self.debug :
+            print(x_locs)
+            print(y_locs)
+        for i, x in enumerate(x_locs) :
+            if i != 0 :
+                pyautogui.mouseDown()
+            pyautogui.moveTo(x + 10, y_locs[i] + 10, .1)
+            pyautogui.mouseUp()
+
+    def do_align_engine(self) :
+        top = (1318, 198)
+        bottom = (1308, 874)
+
+        im = pyautogui.screenshot()
+        top_pix = im.getpixel(top)
+        
+
+        if self.is_approximate(top_pix, (202, 202, 216), 1) :
+            pyautogui.moveTo(top[0], top[1])
+        else :
+            pyautogui.moveTo(bottom[0], bottom[1])
+
+        pyautogui.mouseDown()
+        pyautogui.moveTo(1244, 538)
+        pyautogui.mouseUp() 
+    
+    def do_clear_asteroids(self) :
+        a_color = (55, 112, 66)
+        keep_going = True
+        
+        im = pyautogui.screenshot()
+
+
+        while keep_going :
+            keep_going = False
+            for x in range(557, 1363, 5) :
+                for y in range(137, 940, 5) :
+                    if self.is_approximate(a_color, im.getpixel((x,y)), 1) :
+                        pyautogui.moveTo(x, y)
+                        pyautogui.mouseDown()
+                        pyautogui.mouseUp()
+                        
+                        
+                        keep_going = True
+                        im = pyautogui.screenshot()
+    
+    def do_measure_weather(self) :
