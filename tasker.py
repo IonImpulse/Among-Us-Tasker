@@ -30,6 +30,7 @@ class TaskerDo :
 
         if self.debug :
             print(f"Loaded {len(image_key_list)} image keys")
+            print(image_key_list)
 
         return image_key_list
 
@@ -337,3 +338,70 @@ class TaskerDo :
                         im = pyautogui.screenshot()
     
     def do_measure_weather(self) :
+        pyautogui.moveTo(1220, 852)
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+    
+    def do_buy_beverage(self) :
+        x_locs = (480, 680, 880, 1080)
+        y_locs = (270, 650, 990)
+
+        beverage = (None, None)
+
+        for drawing in os.listdir(self.main_path + "\\task_images\\buy_beverage\\drawings") :
+            
+            if self.debug :
+                print(drawing)
+
+            pos = imagesearch(self.main_path + "\\task_images\\buy_beverage\\drawings\\" + drawing, precision=.6)
+
+            if pos[0] != -1 :
+                beverage = (pos, drawing)
+    
+        beverage_to_get = [imagesearch_loop(self.main_path + "\\task_images\\buy_beverage\\beverages\\" + beverage[1], 0), 0, 0]
+
+        if self.debug:
+            print(f"need to get {beverage}")
+            print(beverage_to_get)
+
+        letters = [(1240, 400), (1350, 400), (1480, 400)]
+        numbers = [(1240, 520), (1350, 520), (1480, 520), (1350, 640)]
+
+        if beverage_to_get[0][0] < x_locs[0] :
+            beverage_to_get[1] = 0
+
+        elif beverage_to_get[0][0] < x_locs[1] :
+            beverage_to_get[1] = 1
+        
+        elif beverage_to_get[0][0] < x_locs[2] :
+            beverage_to_get[1] = 2
+        
+        elif beverage_to_get[0][0] < x_locs[3] :
+            beverage_to_get[1] = 3
+        
+
+        if beverage_to_get[0][1] < y_locs[0] :
+            beverage_to_get[2] = 0
+
+        elif beverage_to_get[0][1] < y_locs[1] :
+            beverage_to_get[2] = 1
+        
+        elif beverage_to_get[0][1] < y_locs[2] :
+            beverage_to_get[2] = 2
+
+        pyautogui.moveTo(letters[beverage_to_get[2]][0], letters[beverage_to_get[2]][1])
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+
+        pyautogui.moveTo(numbers[beverage_to_get[1]][0], numbers[beverage_to_get[1]][1])
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+
+        pyautogui.moveTo(1475, 645)
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+    
+    def do_enter_id_code(self) :
+        pyautogui.moveTo(800, 910)
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()

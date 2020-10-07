@@ -22,7 +22,7 @@ Task that complete on selection are marked AUTO
 - Align Engine Output        DONE
 - Align Telescope
 - Assemble Artifact
-- Buy Beverage
+- Buy Beverage               DONE
 - Calibrate Distributer      DONE
 - Chart Course               DONE
 - Clean O2 Filter            DONE
