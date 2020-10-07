@@ -1,9 +1,10 @@
 import os
-from re import match
 import pyautogui
 import time
 from pyautogui import sleep
 from python_imagesearch.imagesearch import imagesearch
+from python_imagesearch.imagesearch import region_grabber
+from python_imagesearch.imagesearch import imagesearcharea
 from python_imagesearch.imagesearch import imagesearch_loop
 from python_imagesearch.imagesearch import imagesearch_region_loop
 
@@ -26,12 +27,14 @@ class TaskerDo :
         image_key_list = []
 
         for path in os.listdir(main_path + "\\task_images") :
-            image_key_list.append(main_path + "\\task_images\\" + path + "\\key.jpg")
+            for path2 in os.listdir(main_path + "\\task_images\\" + path) :
+                if path2[:3] == "key" :
+                    image_key_list.append((main_path + "\\task_images\\" + path + "\\" + path2, path))
+
 
         if self.debug :
             print(f"Loaded {len(image_key_list)} image keys")
-            print(image_key_list)
-
+            
         return image_key_list
 
     def is_approximate(self, rgb1, rgb2, tolerance) :
@@ -224,7 +227,7 @@ class TaskerDo :
                 if matches != (0,0,0) :
                     pyautogui.click(x=locations[0], y=locations[1][i] + 90)
                     done = True
-                sleep(.1)
+                
 
     def do_prime_shields(self) :
         locations = [(963, 172), (739, 298), (1170, 298), (952, 422), (723, 550), (1170, 550), (952, 678)]
@@ -405,3 +408,143 @@ class TaskerDo :
         pyautogui.moveTo(800, 910)
         pyautogui.mouseDown()
         pyautogui.mouseUp()
+
+        search_region = ((788, 710), (824, 770))
+        region_shift = 28
+        number_list = []
+
+        sleep(.7)
+        im = region_grabber((0, 0, 1920, 1080))
+
+        for i in range(5) :
+            for number in range(10) :
+                if len(number_list) == i : 
+                    temp_search = [search_region[0][0] + (region_shift * i), search_region[0][1], search_region[1][0] + (region_shift * i), search_region[1][1]]
+                    pos = imagesearcharea(self.main_path + "\\task_images\\enter_id_code\\numbers\\" + str(number) + ".jpg", temp_search[0], temp_search[1], temp_search[2], temp_search[3])
+                    
+
+                    if pos[0] != -1 :
+                        number_list.append(number)
+                        if self.debug :
+                            print(f"found {number}!")
+        
+        if self.debug :
+            print(f"ID code is {number_list}")
+        
+        x_locs = (836, 960, 1075)
+        y_locs = (130, 240, 350, 460)
+
+        for number in number_list :
+            
+            if number == 0 :
+              temp_x = x_locs[1]
+              temp_y = y_locs[3]
+            else :  
+                if number < 4 :
+                    temp_y = y_locs[0]
+                elif number < 7 :
+                    temp_y = y_locs[1]
+                else :
+                    temp_y = y_locs[2]
+
+                if (number - 1) % 3 == 0 :
+                    temp_x = x_locs[0]
+                elif (number - 2) % 3 == 0 :
+                    temp_x = x_locs[1]
+                else :
+                    temp_x = x_locs[2]
+            
+            pyautogui.moveTo((temp_x, temp_y))
+            pyautogui.mouseDown()
+            pyautogui.mouseUp()
+        
+        pyautogui.moveTo((x_locs[2], y_locs[3]))
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+    
+    def do_get_water_can(self) :
+        pos1 = imagesearch(self.main_path + "\\task_images\\get_water_can\\can1.jpg")
+        pos2 = imagesearch(self.main_path + "\\task_images\\get_water_can\\can2.jpg")
+        
+        if pos1[0] != -1 :
+            pyautogui.moveTo((pos1[0] + 7, pos1[1] + 7))
+        else :
+            pyautogui.moveTo((pos2[0] + 7, pos2[1] + 7))
+        
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+    
+    def do_water_plants(self) :
+        pyautogui.moveTo((500, 580))
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+
+        pyautogui.moveTo((824, 640))
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+
+        pyautogui.moveTo((1130, 590))
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+
+        pyautogui.moveTo((1417, 617))
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+    
+    def do_assemble_artifact(self) :
+        x_loc = 950
+        y_locs = (185, 300, 423, 550, 665)
+
+        search_area = (420, 890, 1500, 1030)
+
+        for i in range(5) :
+            pos = imagesearcharea(self.main_path + "\\task_images\\assemble_artifact\\pieces\\" + str(i) + ".jpg", search_area[0], search_area[1], search_area[2], search_area[3])
+
+            print(pos[0] + search_area[0], pos[1] + search_area[1])
+
+            pyautogui.moveTo((pos[0] + search_area[0] + 30, pos[1] + search_area[1] + 30))
+            pyautogui.mouseDown()
+            pyautogui.moveTo((x_loc, y_locs[i]))
+            pyautogui.mouseUp()
+
+    def do_inspect_sample(self) :
+        null_button_color = (189, 189, 189)
+        button_loc = (1256, 940)
+        im = pyautogui.screenshot()
+
+        x_locs = (732, 845, 960, 1075, 1190)
+        y_locs = (480, 850)
+        blue = (125, 126, 239)
+        
+        if self.is_approximate(null_button_color, im.getpixel(button_loc), 3) :
+            for i in range(5) :
+                if not self.is_approximate(blue, im.getpixel((x_locs[i], y_locs[0])), 10) :
+                    pyautogui.moveTo(x_locs[i], y_locs[1])
+                    pyautogui.mouseDown()
+                    pyautogui.mouseUp()
+                    break
+        else :
+            pyautogui.moveTo(button_loc[0], button_loc[1])
+            pyautogui.mouseDown()
+            pyautogui.mouseUp()
+    
+    def do_run_diagnostics(self) :
+        null_button_color = (211, 211, 211)
+        button_loc = (777, 945)
+        red = (255, 0, 0)
+        selection_locs = ((756, 246), (670, 355), (702, 454), (813, 414))
+
+        im = pyautogui.screenshot()
+        pos = imagesearcharea(self.main_path + "\\task_images\\run_diagnostics\\begin.jpg", 535, 585, 993, 683)
+
+        if pos[0] == -1 :
+            for i in selection_locs :
+                if self.is_approximate(red, im.getpixel(i), 4) :
+                    pyautogui.moveTo(i[0], i[1] + 20)
+                    pyautogui.mouseDown()
+                    pyautogui.mouseUp()
+                    break
+        else :
+            pyautogui.moveTo(button_loc[0], button_loc[1])
+            pyautogui.mouseDown()
+            pyautogui.mouseUp()
