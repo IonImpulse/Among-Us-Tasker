@@ -8,7 +8,6 @@ from python_imagesearch.imagesearch import imagesearcharea
 from python_imagesearch.imagesearch import imagesearch_loop
 from python_imagesearch.imagesearch import imagesearch_region_loop
 
-
 class TaskerDo :
     def __init__(self, precision, slow_mode, debug) :
         self.main_path = os.path.dirname(os.path.abspath(__file__))
@@ -409,7 +408,7 @@ class TaskerDo :
         pyautogui.mouseDown()
         pyautogui.mouseUp()
 
-        search_region = ((788, 710), (824, 770))
+        search_region = [[788, 710], [824, 770]]
         region_shift = 28
         number_list = []
 
@@ -419,12 +418,21 @@ class TaskerDo :
         for i in range(5) :
             for number in range(10) :
                 if len(number_list) == i : 
-                    temp_search = [search_region[0][0] + (region_shift * i), search_region[0][1], search_region[1][0] + (region_shift * i), search_region[1][1]]
+                    temp_search = [search_region[0][0], search_region[0][1], search_region[1][0], search_region[1][1]]
+                    
                     pos = imagesearcharea(self.main_path + "\\task_images\\enter_id_code\\numbers\\" + str(number) + ".jpg", temp_search[0], temp_search[1], temp_search[2], temp_search[3])
                     
 
                     if pos[0] != -1 :
                         number_list.append(number)
+
+                        search_region[0][0] = search_region[0][0] + region_shift
+                        search_region[1][0] = search_region[1][0] + region_shift
+
+                        if number_list[-1] == 1 :
+                            search_region[0][0] = search_region[0][0] - 6
+                            search_region[1][0] = search_region[1][0] - 6
+
                         if self.debug :
                             print(f"found {number}!")
         
@@ -529,7 +537,6 @@ class TaskerDo :
             pyautogui.mouseUp()
     
     def do_run_diagnostics(self) :
-        null_button_color = (211, 211, 211)
         button_loc = (777, 945)
         red = (255, 0, 0)
         selection_locs = ((756, 246), (670, 355), (702, 454), (813, 414))
@@ -548,3 +555,87 @@ class TaskerDo :
             pyautogui.moveTo(button_loc[0], button_loc[1])
             pyautogui.mouseDown()
             pyautogui.mouseUp()
+    
+    def do_scan_boarding_pass(self) :
+        pyautogui.moveTo(566, 542)
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()
+
+        sleep(.2)
+
+        pyautogui.moveTo(500, 200)
+        pyautogui.mouseDown()
+        pyautogui.mouseUp()        
+
+        pyautogui.mouseDown()
+        pyautogui.moveTo(1040, 230)
+        pyautogui.mouseUp()
+    
+    def do_sort_samples(self) :
+        types = ("fossils", "gems", "plants")
+
+        bins = ((970, 200), (625, 580), (1295, 600))
+        area = ((400, 770), (1540, 1080))
+
+        for index, sample in enumerate(types) :
+            for i in range(2) :
+                pos = imagesearcharea(self.main_path + "\\task_images\\sort_samples\\" + sample + "\\" + str(i) + ".jpg", area[0][0], area[0][1], area[1][0], area[1][1])
+
+                pyautogui.moveTo(pos[0] + area[0][0], pos[1] + area[0][1])
+                pyautogui.mouseDown()
+
+                pyautogui.moveTo(bins[index][0], bins[index][1])
+                pyautogui.mouseUp()
+    
+    def do_insert_keys(self) :
+        key_pos = imagesearch(self.main_path + "\\task_images\\insert_keys\\0.jpg")
+
+        hole_pos = imagesearch(self.main_path + "\\task_images\\insert_keys\\1.jpg")
+
+        pyautogui.moveTo(key_pos[0] + 3, key_pos[1] + 10)
+        pyautogui.mouseDown()
+
+        pyautogui.moveTo(hole_pos[0] + 30, hole_pos[1] + 30)
+        pyautogui.mouseUp()
+
+        pyautogui.moveTo(hole_pos[0] + 80, hole_pos[1])
+        pyautogui.mouseDown()
+
+        pyautogui.moveTo(hole_pos[0] + 150, hole_pos[1] + 150)
+        
+        pyautogui.mouseUp()
+    
+    def do_repair_drill(self) :
+        pyautogui.moveTo(780, 235)
+        pyautogui.click(clicks=4, interval=.1)
+        pyautogui.moveTo(1130, 235)
+        pyautogui.click(clicks=4, interval=.1)
+        pyautogui.moveTo(780, 810)
+        pyautogui.click(clicks=4, interval=.1)
+        pyautogui.moveTo(1130, 840)
+        pyautogui.click(clicks=4, interval=.1)
+
+    def do_record_temperature(self) :
+        mode = "down"
+        im = pyautogui.screenshot()
+
+        if self.is_approximate(im.getpixel((1439, 636)), (214, 100, 126), 3) : 
+            mode = "up"
+        
+        keep_going = True
+        tries_left = 32
+        
+        if mode == "up" :
+            pyautogui.moveTo(635, 360)
+        else :
+            pyautogui.moveTo(635, 645)
+
+        pyautogui.mouseDown()
+
+        while keep_going and tries_left > 0 :
+            pos = imagesearcharea(self.main_path + "\\task_images\\record_temperature\\done.jpg", 666, 509, 875, 641)
+
+            if pos[0] != -1 :
+                keep_going = False
+
+        pyautogui.mouseUp()

@@ -32,7 +32,7 @@ Task that complete on selection are marked AUTO
 - Fix Wiring                 DONE
 - Fuel Engines               DONE
 - - Refuel Station           DONE
-- Insert Keys
+- Insert Keys                DONE
 - Inspect Sample             DONE
 - Measure Weather            DONE
 - Monitor Tree
@@ -40,12 +40,12 @@ Task that complete on selection are marked AUTO
 - Prime Shields              DONE
 - Process Data               DONE
 - Reboot Wifi
-- Record Temperature
-- Repair Drill
+- Record Temperature         DONE
+- Repair Drill               DONE
 - Replace Water Jug
 - Run Diagnostics            DONE
-- Scan Boarding Pass
-- Sort Samples
+- Scan Boarding Pass         DONE
+- Sort Samples               DONE
 - Stabilize Steering         DONE
 - Start Reactor              DONE
 - Store Artifacts
