@@ -1,4 +1,5 @@
 import os
+from numpy.lib.utils import source
 import pyautogui
 import time
 from pyautogui import sleep
@@ -44,6 +45,30 @@ class TaskerDo :
         
         return False
     
+    def solvemaze(self, r, c, maze, solution) :
+        if (r == 6) and (c == 17):
+            solution[r][c] = 1;
+            return solution;
+
+        if r >=0 and c >=0 and r < 7 and c < 19 and solution[r][c] == 0 and maze[r][c] == 0:
+            solution[r][c] = 1
+            
+            if self.solvemaze(r+1, c, maze, solution):
+                return solution
+            
+            if self.solvemaze(r, c+1, maze, solution):
+                return solution
+            
+            if self.solvemaze(r-1, c, maze, solution):
+                return solution
+
+            if self.solvemaze(r, c-1, maze, solution):
+                return solution
+
+            solution[r][c] = 0;
+            return False;
+        
+
     def switch(self, name):
         default = f"Error on {name}"
         return getattr(self, 'do_' + str(name), lambda: default)()
@@ -208,7 +233,7 @@ class TaskerDo :
         sleep(3.1)
         pyautogui.mouseUp()
 
-    def do_fuel_engine(self) :
+    def do_fuel_engines(self) :
         pyautogui.moveTo(1470, 890)
         pyautogui.mouseDown()
         sleep(3.1)
@@ -328,16 +353,18 @@ class TaskerDo :
 
         while keep_going :
             keep_going = False
-            for x in range(557, 1363, 5) :
-                for y in range(137, 940, 5) :
-                    if self.is_approximate(a_color, im.getpixel((x,y)), 1) :
-                        pyautogui.moveTo(x, y)
-                        pyautogui.mouseDown()
-                        pyautogui.mouseUp()
-                        
-                        
-                        keep_going = True
-                        im = pyautogui.screenshot()
+            for i in range(5) :
+                for x in range(557, 1363, 5) :
+                    for y in range(137, 940, 5) :
+                        if self.is_approximate(a_color, im.getpixel((x,y)), 1) :
+                            pyautogui.moveTo(x, y)
+                            pyautogui.mouseDown()
+                            pyautogui.mouseUp()
+                            
+                            
+                            keep_going = True
+                            im = pyautogui.screenshot()
+                sleep(.1)
     
     def do_measure_weather(self) :
         pyautogui.moveTo(1220, 852)
@@ -639,3 +666,128 @@ class TaskerDo :
                 keep_going = False
 
         pyautogui.mouseUp()
+    
+    def do_reboot_wifi(self) :
+        im = pyautogui.screenshot()
+
+        if self.is_approximate(im.getpixel((1175, 237)), (211, 68, 68), 3) :
+            pyautogui.moveTo(1175, 237)
+            pyautogui.mouseDown()
+            pyautogui.moveTo(1175, 900)
+            pyautogui.mouseUp()
+        
+        else :
+            pyautogui.moveTo(1175, 832)
+            pyautogui.mouseDown()
+            pyautogui.moveTo(1175, 210)
+            pyautogui.mouseUp()
+    
+    def do_fix_weather_node(self) :
+        
+        starting_point = (459, 330)
+        x_step = 56
+        y_step = 56
+
+        im = pyautogui.screenshot()
+        maze = []
+
+        for row in range(7) :
+            maze.append([])
+            for column in range(19) :
+                pix = im.getpixel((starting_point[0] + (x_step * column), starting_point[1] + (y_step * row)))
+
+                if self.is_approximate(pix, (165, 162, 140), 20) or self.is_approximate(pix, (205, 203, 191), 10) :
+                    maze[row].append(0)
+                else :
+                    maze[row].append(1)
+
+            if self.debug :
+                print(maze[row])
+
+        maze[0][1] = 0
+
+        solution = [[0]*19 for _ in range(7)]
+        solution = self.solvemaze(0,1, maze, solution)
+        
+        if self.debug :
+            print("\n\n")
+
+            for i in solution :
+                print(i)
+
+        pyautogui.moveTo(459 + 56, 330)
+        pyautogui.mouseDown()
+
+        keep_going = True
+        last_point = [0, 1]
+        current_point = [0, 1]
+
+        while keep_going :
+            options = [[1, -1], [1, -1]]
+
+            if current_point[0] + 1 > 18 :
+                del options[0][0]
+            if current_point[0] - 1 < 0 :
+                del options[0][1]
+            if current_point[0] + 1 > 6 :
+                del options[1][0]
+            if current_point[0] - 1 < 0 :
+                del options[1][1]
+
+            found = False
+            for index, option_set in enumerate(options) :
+                for option in option_set :
+                    if found == False :
+                        if index == 0 :
+                            temp = (current_point[0] + option, current_point[1])
+                            if solution[temp[0]][temp[1]] == 1 and last_point != temp :
+                                last_point = current_point
+                                current_point = temp
+                                found = True
+                        else :
+                            temp = (current_point[0], current_point[1] + option)
+                            if solution[temp[0]][temp[1]] == 1 and last_point != temp :
+                                last_point = current_point
+                                current_point = temp
+                                found = True
+            pyautogui.moveTo(459 + (current_point[1] * 56), 330 + (current_point[0] *56))
+
+            if current_point == (6, 17) :
+                keep_going = False
+
+    def do_fix_weather_node_switch(self) :
+        pos = imagesearch(self.main_path + "\\task_images\\fix_weather_node_switch\\wrong.jpg")
+
+        pyautogui.moveTo(pos[0] + 40, pos[1] + 30)
+
+        pyautogui.click()
+    
+    def do_store_artifacts(self) :
+        pyautogui.moveTo(480, 300)
+        pyautogui.mouseDown()
+        pyautogui.moveTo(850, 300)
+        pyautogui.mouseUp()
+
+        pyautogui.moveTo(505, 447)
+        pyautogui.mouseDown()
+        pyautogui.moveTo(1058, 411)
+        pyautogui.mouseUp()
+
+        pyautogui.moveTo(507, 635)
+        pyautogui.mouseDown()
+        pyautogui.moveTo(853, 600)
+        pyautogui.mouseUp()
+        
+        pyautogui.moveTo(490, 770)
+        pyautogui.mouseDown()
+        pyautogui.moveTo(1055, 745)
+        pyautogui.mouseUp()
+    
+    def do_replace_water_jug(self) :
+        pyautogui.moveTo(950, 160)
+        pyautogui.mouseDown()
+        sleep(5)
+        pyautogui.mouseUp()
+    
+    def do_monitor_tree(self) :
+        regions = ((490, 200), (720, 750))
